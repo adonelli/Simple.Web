@@ -1,6 +1,7 @@
 namespace Simple.Web.Cors
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public class AccessControlEntry : IAccessControlEntry
     {
@@ -11,13 +12,13 @@ namespace Simple.Web.Cors
         private readonly string _exposeHeaders;
         private readonly string _allowHeaders;
         private readonly long? _maxAge;
-        private readonly string _methods;
+        private readonly ISet<string> _methods;
         private readonly string _origin;
 
         public AccessControlEntry(string origin, string methods = null, long? maxAge = null, string allowHeaders = null, bool? credentials = null, string exposeHeaders = null)
         {
             _origin = origin;
-            _methods = methods;
+            _methods = string.IsNullOrWhiteSpace(methods) ? null : new HashSet<string>(methods.Split(',').Select(m => m.Trim()));
             _maxAge = maxAge;
             _allowHeaders = allowHeaders;
             _credentials = credentials;
@@ -39,7 +40,7 @@ namespace Simple.Web.Cors
             get { return _credentials; }
         }
 
-        public string Methods
+        public ISet<string> Methods
         {
             get { return _methods; }
         }

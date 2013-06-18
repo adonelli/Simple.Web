@@ -186,9 +186,9 @@ namespace Simple.Web.Http
             {
                 response.SetHeader(HeaderKeys.AccessControlExposeHeaders, accessControl.ExposeHeaders);
             }
-            if (!string.IsNullOrWhiteSpace(accessControl.Methods))
+            if (accessControl.Methods != null)
             {
-                response.SetHeader(HeaderKeys.AccessControlAllowMethods, accessControl.Methods);
+                response.SetHeader(HeaderKeys.AccessControlAllowMethods, string.Join(",", accessControl.Methods));
             }
             if (accessControl.Credentials.HasValue)
             {

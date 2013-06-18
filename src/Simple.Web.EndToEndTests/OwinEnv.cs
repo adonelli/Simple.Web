@@ -25,6 +25,11 @@
             _dictionary[OwinKeys.ResponseHeaders] = responseHeaders;
         }
 
+        public IDictionary<string, string[]> ResponseHeaders
+        {
+            get { return _dictionary[OwinKeys.ResponseHeaders] as IDictionary<string, string[]>; }
+        }
+
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
             return _dictionary.GetEnumerator();

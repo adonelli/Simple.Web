@@ -110,19 +110,45 @@
 
         private static void HandleOptions(IContext context)
         {
+            string[] origin;
+            IAccessControlEntry entry;
+            if (context.Request.Headers.TryGetValue("Origin", out origin))
+            {
+                if (origin.Length != 1)
+                {
+                    context.Response.Status = 400;
+                    return;
+                }
+
+                if (!SimpleWeb.Configuration.AccessControl.TryGetEntry(origin[0], out entry))
+                {
+                    context.Response.Status = 403;
+                    return;
+                }
+                context.Response.AddHeader(HeaderKeys.AccessControlAllowOrigin, origin[0]);
+            }
+            else
+            {
+                entry = null;
+            }
             if (OptionsTable == null)
             {
                 OptionsTable = BuildOptionsTable();
             }
 
             var handlers = OptionsTable.GetAll(context.Request.Url.AbsolutePath);
-            var methods = string.Join(",", handlers.SelectMany(hti => hti.Methods).Distinct());
-            if (string.IsNullOrWhiteSpace(methods))
+            IEnumerable<string> methods = handlers.SelectMany(h => h.Methods);
+            if (entry != null && entry.Methods != null)
+            {
+                methods = methods.Union(entry.Methods);
+            }
+            var methodHeader = string.Join(",", methods);
+            if (string.IsNullOrWhiteSpace(methodHeader))
             {
                 context.Response.Status = 404;
                 return;
             }
-            context.Response.AddHeader(HeaderKeys.AccessControlAllowMethods, methods);
+            context.Response.AddHeader(HeaderKeys.AccessControlAllowMethods, methodHeader);
         }
 
         private static string CombineQueryStringValues(string[] values)

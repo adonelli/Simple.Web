@@ -18,6 +18,26 @@ namespace Simple.Web.EndToEndTests
             SimpleWeb.Configuration.AccessControl.Add(new AccessControlEntry("http://earth.com", "GET,POST,PUT,DELETE",
                                                                              credentials: true));
 
+            var env = CreateTestOwinEnv();
+            Application.Run(env);
+
+            Assert.Contains("Access-Control-Allow-Methods", env.ResponseHeaders.Keys);
+        }
+
+        [Fact]
+        public void OptionsReturnsOrigin()
+        {
+            SimpleWeb.Configuration.AccessControl.Add(new AccessControlEntry("http://earth.com", "GET,POST,PUT,DELETE",
+                                                                             credentials: true));
+
+            var env = CreateTestOwinEnv();
+            Application.Run(env);
+
+            Assert.Contains("Access-Control-Allow-Origin", env.ResponseHeaders.Keys);
+        }
+
+        private static OwinEnv CreateTestOwinEnv()
+        {
             var requestHeaders = new HeaderDictionary
                 {
                     {"Origin", "http://earth.com"},
@@ -27,9 +47,7 @@ namespace Simple.Web.EndToEndTests
             var env = new OwinEnv("OPTIONS", TestUri,
                                   requestHeaders,
                                   responseHeaders);
-            Application.Run(env);
-
-            Assert.Contains("Access-Control-Allow-Methods", responseHeaders.Keys);
+            return env;
         }
     }
 }
