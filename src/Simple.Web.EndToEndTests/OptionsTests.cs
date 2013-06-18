@@ -29,7 +29,7 @@ namespace Simple.Web.EndToEndTests
                                   responseHeaders);
             Application.Run(env);
 
-            Assert.Contains("Access-Control-Allow-Origin", responseHeaders.Keys);
+            Assert.Contains("Access-Control-Allow-Methods", responseHeaders.Keys);
         }
     }
 }

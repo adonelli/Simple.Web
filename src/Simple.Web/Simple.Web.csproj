@@ -86,6 +86,7 @@
     <Compile Include="Authentication\DefaultAuthenticationProvider.cs" />
     <Compile Include="CodeGeneration\ScopedHandler.cs" />
     <Compile Include="CodeGeneration\TypeEx.cs" />
+    <Compile Include="Cors\AccessControlCollection.cs" />
     <Compile Include="Cors\AccessControlEntry.cs" />
     <Compile Include="Cors\IAccessControlEntry.cs" />
     <Compile Include="ExplicitGenericResolverAttribute.cs" />

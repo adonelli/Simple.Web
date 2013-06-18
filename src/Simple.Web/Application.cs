@@ -80,8 +80,17 @@
         {
             Startup();
 
-            if (TryHandleAsStaticContent(context))
+            if (context.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase))
             {
+                if (TryHandleAsStaticContent(context))
+                {
+                    return MakeCompletedTask();
+                }
+            }
+
+            if (context.Request.HttpMethod.Equals("OPTIONS"))
+            {
+                HandleOptions(context);
                 return MakeCompletedTask();
             }
 
@@ -97,6 +106,23 @@
 
             var task = PipelineFunctionFactory.Get(handlerInfo.HandlerType, handlerInfo.HttpMethod)(context, handlerInfo);
             return task ?? MakeCompletedTask();
+        }
+
+        private static void HandleOptions(IContext context)
+        {
+            if (OptionsTable == null)
+            {
+                OptionsTable = BuildOptionsTable();
+            }
+
+            var handlers = OptionsTable.GetAll(context.Request.Url.AbsolutePath);
+            var methods = string.Join(",", handlers.SelectMany(hti => hti.Methods).Distinct());
+            if (string.IsNullOrWhiteSpace(methods))
+            {
+                context.Response.Status = 404;
+                return;
+            }
+            context.Response.AddHeader(HeaderKeys.AccessControlAllowMethods, methods);
         }
 
         private static string CombineQueryStringValues(string[] values)
@@ -228,14 +254,21 @@
         }
 
         private static readonly ConcurrentDictionary<string, RoutingTable> RoutingTables = new ConcurrentDictionary<string, RoutingTable>(StringComparer.OrdinalIgnoreCase);
+        private static RoutingTable OptionsTable;
 
         internal static RoutingTable BuildRoutingTable(string httpMethod)
         {
-            var types = ExportedTypeHelper.FromCurrentAppDomain(IsHttpMethodHandler).ToList();
+            var types = ExportedTypeHelper.FromCurrentAppDomain(IsHttpMethodHandler);
             var handlerTypes = types
                 .Where(i => HttpMethodAttribute.Matches(i,httpMethod))
                 .ToArray();
 
+            return new RoutingTableBuilder(handlerTypes).BuildRoutingTable();
+        }
+
+        internal static RoutingTable BuildOptionsTable()
+        {
+            var handlerTypes = ExportedTypeHelper.FromCurrentAppDomain(IsHttpMethodHandler).ToArray();
             return new RoutingTableBuilder(handlerTypes).BuildRoutingTable();
         }
 

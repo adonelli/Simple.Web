@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fix">
+      <HintPath>..\packages\Fix.0.3.2.10\lib\net40\Fix.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,10 +42,29 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="xunit">
+      <HintPath>..\packages\xunit.1.9.1\lib\net20\xunit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="App\GetCustomers.cs" />
+    <Compile Include="HeaderDictionary.cs" />
+    <Compile Include="OptionsTests.cs" />
+    <Compile Include="OwinEnv.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Simple.Web.JsonNet\Simple.Web.JsonNet.csproj">
+      <Project>{6dce0964-3bf0-4185-ac6e-1f8b97908601}</Project>
+      <Name>Simple.Web.JsonNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Simple.Web\Simple.Web.csproj">
+      <Project>{903c289d-4cae-4259-80da-79d74ce06dce}</Project>
+      <Name>Simple.Web</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

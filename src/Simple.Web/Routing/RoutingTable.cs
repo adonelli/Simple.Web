@@ -22,7 +22,6 @@
 
         public void Add(string template, HandlerTypeInfo type)
         {
-            var matchers = _matchers;
             var parts = template.Trim('/').Split(new[] {'/'});
             if (parts.Length == 0)
             {
@@ -33,9 +32,9 @@
             {
                 matcher = _statics[parts[0]];
             }
-            else if (matchers.Contains(parts[0]))
+            else if (_matchers.Contains(parts[0]))
             {
-                matcher = matchers[parts[0]];
+                matcher = _matchers[parts[0]];
             }
             else
             {
@@ -46,7 +45,7 @@
                 }
                 else
                 {
-                    matchers.Add(matcher);
+                    _matchers.Add(matcher);
                 }
             }
 
@@ -69,21 +68,8 @@
         /// <returns></returns>
         public Type Get(string url, out IDictionary<string, string> variables, string contentType = null, IList<string> acceptTypes = null)
         {
-            variables = null;
-            url = url.Trim('/');
-            int nextIndex = url.IndexOf('/');
-            string part = nextIndex >= 0 ? url.Substring(0, nextIndex) : url;
-            IMatcher matcher;
-            var matchData = new MatchData();
-            bool found = false;
-            if (_statics.TryGetValue(part, out matcher))
-            {
-                found = matcher.Match(part, url, nextIndex, matchData);
-            }
-            if (!found)
-            {
-                found = _matchers.Aggregate(false, (current, t) => t.Match(part, url, nextIndex, matchData) || current);
-            }
+            MatchData matchData;
+            var found = MatchData(url, out variables, out matchData);
 
             if (!found) return null;
 
@@ -94,6 +80,35 @@
             }
 
             return matchData.ResolveByMediaTypes(contentType, acceptTypes);
+        }
+
+        public IEnumerable<HandlerTypeInfo> GetAll(string url)
+        {
+            MatchData matchData;
+            IDictionary<string, string> variables;
+            var found = MatchData(url, out variables, out matchData);
+            return found ? matchData.List : Enumerable.Empty<HandlerTypeInfo>();
+        }
+
+        private bool MatchData(string url, out IDictionary<string, string> variables, out MatchData matchData)
+        {
+            variables = null;
+            url = url.Trim('/');
+            int nextIndex = url.IndexOf('/');
+            string part = nextIndex >= 0 ? url.Substring(0, nextIndex) : url;
+            IMatcher matcher;
+            var foundMatchData = new MatchData();
+            bool found = false;
+            if (_statics.TryGetValue(part, out matcher))
+            {
+                found = matcher.Match(part, url, nextIndex, foundMatchData);
+            }
+            if (!found)
+            {
+                found = _matchers.Aggregate(false, (current, t) => t.Match(part, url, nextIndex, foundMatchData) || current);
+            }
+            matchData = foundMatchData;
+            return found;
         }
 
         public HashSet<Type> GetAllTypes()

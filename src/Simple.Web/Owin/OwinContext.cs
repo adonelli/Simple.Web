@@ -11,7 +11,15 @@
         {
             Variables = env;
             Request = new OwinRequest(env, (IDictionary<string,string[]>)env[OwinKeys.RequestHeaders], (Stream)env[OwinKeys.RequestBody]);
-            Response = new OwinResponse();
+            object headers;
+            if (env.TryGetValue(OwinKeys.ResponseHeaders, out headers))
+            {
+                Response = new OwinResponse(headers as IDictionary<string, string[]>);
+            }
+            else
+            {
+                Response = new OwinResponse();
+            }
         }
 
         public IRequest Request { get; private set; }

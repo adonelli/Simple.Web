@@ -1,6 +1,7 @@
 namespace Simple.Web.Http
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
@@ -61,6 +62,20 @@ namespace Simple.Web.Http
                 .Cast<HttpMethodAttribute>()
                 .FirstOrDefault(a => a.HttpMethod.Equals(httpMethod, StringComparison.OrdinalIgnoreCase));
             return customAttribute ?? type.GetInterfaces().Select(i => Get(i, httpMethod)).FirstOrDefault(a => a != null);
+        }
+
+        public static IEnumerable<string> GetAll(Type type, bool excludeInterfaces = false)
+        {
+            var all = GetCustomAttributes(type, typeof (HttpMethodAttribute), true)
+                .Cast<HttpMethodAttribute>()
+                .Select(hma => hma.HttpMethod);
+
+            if (!excludeInterfaces)
+            {
+                all = all.Concat(type.GetInterfaces().SelectMany(i => GetAll(i, true)));
+            }
+
+            return all;
         }
 
         public static Type GetAttributedType(Type type, string httpMethod)

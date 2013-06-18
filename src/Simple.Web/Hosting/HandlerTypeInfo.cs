@@ -3,10 +3,12 @@ namespace Simple.Web.Hosting
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Http;
 
     internal sealed class HandlerTypeInfo
     {
         private readonly Type _type;
+        private readonly string[] _methods;
         private readonly HashSet<string> _respondsToTypes;
         private readonly HashSet<string> _respondsWithTypes;
         private readonly int _priority;
@@ -23,6 +25,7 @@ namespace Simple.Web.Hosting
         public HandlerTypeInfo(Type type, IEnumerable<string> respondsToTypes, IEnumerable<string> respondsWithTypes)
         {
             _type = type;
+            _methods = HttpMethodAttribute.GetAll(_type).ToArray();
             if (respondsToTypes != null)
             {
                 _respondsToTypes = new HashSet<string>(respondsToTypes, StringComparer.OrdinalIgnoreCase);
@@ -39,6 +42,7 @@ namespace Simple.Web.Hosting
                                 int priority)
         {
             _type = type;
+            _methods = HttpMethodAttribute.GetAll(_type).ToArray();
             _respondsToTypes = respondsToTypes;
             _respondsWithTypes = respondsWithTypes;
             _priority = priority;
@@ -69,6 +73,11 @@ namespace Simple.Web.Hosting
         public bool RespondsWithAll
         {
             get { return _respondsWithTypes == null; }
+        }
+
+        public string[] Methods
+        {
+            get { return _methods; }
         }
 
         public HandlerTypeInfo SetPriority(int priority)

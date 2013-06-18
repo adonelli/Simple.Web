@@ -1,7 +1,5 @@
 namespace Simple.Web.Cors
 {
-    using System;
-    using System.Collections;
     using System.Collections.Generic;
 
     public class AccessControlEntry : IAccessControlEntry
@@ -76,91 +74,6 @@ namespace Simple.Web.Cors
             {
                 return obj.Origin.GetHashCode();
             }
-        }
-    }
-
-    public class AccessControlCollection : IDictionary<string, IAccessControlEntry>
-    {
-        private readonly IDictionary<string, IAccessControlEntry> _entries = new Dictionary<string, IAccessControlEntry>(StringComparer.OrdinalIgnoreCase);
-        public IEnumerator<KeyValuePair<string, IAccessControlEntry>> GetEnumerator()
-        {
-            return _entries.GetEnumerator();
-        }
-
-        public void Add(KeyValuePair<string, IAccessControlEntry> item)
-        {
-            _entries.Add(item);
-        }
-
-        public void Clear()
-        {
-            _entries.Clear();
-        }
-
-        public bool Contains(KeyValuePair<string, IAccessControlEntry> item)
-        {
-            return _entries.Contains(item);
-        }
-
-        public void CopyTo(KeyValuePair<string, IAccessControlEntry>[] array, int arrayIndex)
-        {
-            _entries.CopyTo(array, arrayIndex);
-        }
-
-        public bool Remove(KeyValuePair<string, IAccessControlEntry> item)
-        {
-            return _entries.Remove(item);
-        }
-
-        public int Count
-        {
-            get { return _entries.Count; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return _entries.IsReadOnly; }
-        }
-
-        public bool ContainsKey(string key)
-        {
-            return _entries.ContainsKey(key);
-        }
-
-        public void Add(string key, IAccessControlEntry value)
-        {
-            _entries.Add(key, value);
-        }
-
-        public bool Remove(string key)
-        {
-            return _entries.Remove(key);
-        }
-
-        public bool TryGetValue(string key, out IAccessControlEntry value)
-        {
-            return _entries.TryGetValue(key, out value);
-        }
-
-        public IAccessControlEntry this[string key]
-        {
-            get { return _entries[key]; }
-            set { _entries[key] = value; }
-        }
-
-        public ICollection<string> Keys
-        {
-            get { return _entries.Keys; }
-        }
-
-        public ICollection<IAccessControlEntry> Values
-        {
-            get { return _entries.Values; }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

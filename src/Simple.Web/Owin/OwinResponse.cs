@@ -9,6 +9,15 @@ namespace Simple.Web.Owin
 
     internal class OwinResponse : IResponse
     {
+        public OwinResponse()
+        {
+            
+        }
+
+        public OwinResponse(IDictionary<string, string[]> headers)
+        {
+            Headers = headers;
+        }
         public Status Status { get; set; }
         public Func<Stream, Task> WriteFunction { get; set; }
         public IDictionary<string, string[]> Headers { get; set; }
